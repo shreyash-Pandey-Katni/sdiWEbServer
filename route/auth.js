@@ -4,6 +4,7 @@ const Student = require('../model/student');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const router = express.Router();
+const path = require('path');
 // cons mongoose = require('mongoose');
 
 const authController  =require('../controllers/AuthController');
@@ -28,6 +29,13 @@ router.post('/register', (req, res, next) => {
         
             student.save()
             .then(student => {
+                try {
+                    if (!fs.existsSync(path.join(__dirname,'assets', req.headers.usn))) {
+                        fs.mkdirSync(path.join(__dirname, 'assets',req.headers.usn))
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
                 res.sendStatus(200);
             })
             .catch(err => {
@@ -35,13 +43,7 @@ router.post('/register', (req, res, next) => {
                 res.sendStatus(403);
             })
         })
-        try {
-            if (!fs.existsSync(`../assets/users/${req.headers.usn}`)) {
-                
-            }
-        } catch (error) {
-            console.log(error);
-        }
+        
     }
     else {
         res.sendStatus(404);

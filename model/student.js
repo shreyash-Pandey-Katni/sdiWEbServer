@@ -22,6 +22,12 @@ const studentSchema = new schema({
         type: String,
         unique: true,
         required: true
+    },
+    marks: {
+        type: String
+    },
+    cgpa: {
+        type: String,
     }
 }, {timestamps:true})
 
