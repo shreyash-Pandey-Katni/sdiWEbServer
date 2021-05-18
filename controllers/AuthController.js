@@ -30,20 +30,23 @@ const register = (req, res, next) => {
 }
 
 const login = (req, res, next) => {
+    // console.log(req);
     var password = req.headers.password;
-    Student.findOne({$or: [{usn:req.headers.usn}]})
+    var usn = req.headers.usn;
+    // console.log(req.headers.usn);
+    Student.findOne({usn: this.usn})
     .then(students => {
-        if (student) {
-            bcryptjs.compare(password, user.password, (err, result) => {
+        if (students) {
+            bcryptjs.compare(password, students.password, (err, result) => {
                 if (err) {
-                    res.sendStatus(200);
+                    res.sendStatus(403);
                 }
                 if (result) {
-                    let token = jwt.sign({usn:user.usn}, 'verySecretValue', {expiresIn:'1h'})
+                    let token = jwt.sign({usn:students.usn}, 'verySecretValue', {expiresIn:'1h'})
                     res.json({
                         token
                     });
-                    res.sendStatus(200)
+                    // res.sendStatus(200)
                 }
             })
         } else {
