@@ -48,7 +48,8 @@ const login = (req, res, next) => {
                 if (result) {
                     let token = jwt.sign({usn:students.usn}, 'verySecretValue', {expiresIn:'1h'})
                     res.json({
-                        token
+                        token,
+                        "name": students.name
                     });
                     // res.sendStatus(200)
                 }
