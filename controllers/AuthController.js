@@ -1,10 +1,11 @@
 const bcryptjs = require('bcryptjs');
 const Student = require('../model/student');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 // const student = require('../model/student');
 
 const register = (req, res, next) => {
-    if (req.headers.user && req.headers.phone && req.headers.email && req.headers.password && req.headers.usn) {
+    if (req.headers.name && req.headers.phone && req.headers.email && req.headers.password && req.headers.usn) {
         bcryptjs.hash(req.headers.password, 10, (err, hashPassword) => {
             if (err) {
                 res.json({
@@ -12,11 +13,12 @@ const register = (req, res, next) => {
                 })
             }
             let student = new Student({
-                name: req.headers.user,
+                name: req.headers.name,
                 phone: req.headers.phone,
                 email: req.headers.email,
                 password: hashPassword,
                 usn: req.headers.usn
+                // usn: req.headers.usn
             })
         
             student.save()
@@ -27,6 +29,13 @@ const register = (req, res, next) => {
                 res.sendStatus(403);
             })
         })
+        try {
+            if (!fs.existsSync(`../assets/users/${req.headers.usn}`)) {
+                
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
     else {
         res.sendStatus(404);
@@ -36,9 +45,9 @@ const register = (req, res, next) => {
 const login = (req, res, next) => {
     // console.log(req);
     var password = req.headers.password;
-    var usn = req.headers.usn;
+    var usnNumber = req.headers.usn;
     // console.log(req.headers.usn);
-    Student.findOne({usn: this.usn})
+    Student.findOne({usn: usnNumber})
     .then(students => {
         if (students) {
             bcryptjs.compare(password, students.password, (err, result) => {

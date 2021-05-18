@@ -15,7 +15,9 @@ const studentSchema = new schema({
         type: String
     },
     usn : {
-        String
+        type: String,
+        unique: true,
+        required: true
     }
 }, {timestamps:true})
 
