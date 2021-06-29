@@ -5,9 +5,9 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const router = express.Router();
 const path = require('path');
-// cons mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-const authController  =require('../controllers/AuthController');
+const authController = require('../controllers/AuthController');
 
 
 router.post('/register', (req, res, next) => {
@@ -15,7 +15,7 @@ router.post('/register', (req, res, next) => {
         bcryptjs.hash(req.headers.password, 10, (err, hashPassword) => {
             if (err) {
                 res.json({
-                    error:err
+                    error: err
                 })
             }
             let student = new Student({
@@ -26,26 +26,25 @@ router.post('/register', (req, res, next) => {
                 usn: req.headers.usn
                 // usn: req.headers.usn
             })
-        
+
             student.save()
-            .then(student => {
-                try {
-                    if (!fs.existsSync(path.join(__dirname,'assets', req.headers.usn))) {
-                        fs.mkdirSync(path.join(__dirname, 'assets',req.headers.usn))
+                .then(student => {
+                    try {
+                        if (!fs.existsSync(path.join(__dirname, 'assets', req.headers.usn))) {
+                            fs.mkdirSync(path.join(__dirname, 'assets', req.headers.usn))
+                        }
+                    } catch (error) {
+                        console.log(error);
                     }
-                } catch (error) {
-                    console.log(error);
-                }
-                res.sendStatus(200);
-            })
-            .catch(err => {
-                console.error(err);
-                res.sendStatus(403);
-            })
+                    res.sendStatus(200);
+                })
+                .catch(err => {
+                    console.error(err);
+                    res.sendStatus(403);
+                })
         })
-        
-    }
-    else {
+
+    } else {
         res.sendStatus(404);
     }
 });
@@ -54,25 +53,33 @@ router.get('/login', (req, res, next) => {
     var password = req.headers.password;
     var usnNumber = req.headers.usn;
     // console.log(req.headers.usn);
-    Student.findOne({usn: usnNumber})
-    .then(students => {
-        if (students) {
-            bcryptjs.compare(password, students.password, (err, result) => {
-                if (err) {
-                    res.sendStatus(403);
-                }
-                if (result) {
-                    let token = jwt.sign({usn:students.usn}, 'verySecretValue', {expiresIn:'1h'})
-                    res.json({
-                        token,
-                        "name": students.name
-                    });
-                    // res.sendStatus(200)
-                }
-            })
-        } else {
-            res.sendStatus(404)
-        }
-    })
+    Student.student.findOne({
+            usn: usnNumber
+        })
+        .then(students => {
+            if (students) {
+                bcryptjs.compare(password, students.password, (err, result) => {
+                    if (err) {
+                        res.sendStatus(403);
+                    }
+                    if (result) {
+                        let token = jwt.sign({
+                            usn: students.usn
+                        }, 'verySecretValue', {
+                            expiresIn: '1h'
+                        })
+                        res.json({
+                            token,
+                            "name": students.name,
+                            "semester": students.semester == null ? 0 : students.semester,
+                            "marks": students.marks == null ? 0 : students.marks
+                        });
+                        // res.sendStatus(200)
+                    }
+                })
+            } else {
+                res.sendStatus(404)
+            }
+        })
 });
 module.exports = router;
