@@ -27,7 +27,7 @@ const studentSchema = new schema({
         type: String
     },
     cgpa: {
-        type: Double,
+        type: mongoose.Schema.Types.Decimal128,
         default: 0.0
     },
     semester: {
@@ -125,7 +125,7 @@ const questionSchemaStackOverFlow = new schema({
         type: [answersSchemaStackOverFlow]
     },
     author: {
-        type: student,
+        type: studentSchema,
         required: true
     },
     subject: {

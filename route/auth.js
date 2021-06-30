@@ -18,12 +18,15 @@ router.post('/register', (req, res, next) => {
                     error: err
                 })
             }
-            let student = new Student({
+            let student = new Student.student({
                 name: req.headers.name,
                 phone: req.headers.phone,
                 email: req.headers.email,
                 password: hashPassword,
-                usn: req.headers.usn
+                usn: req.headers.usn,
+                semester: req.headers.semester,
+                section: req.headers.section,
+                batch: req.headers.batch
                 // usn: req.headers.usn
             })
 

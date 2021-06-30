@@ -39,26 +39,66 @@ app.get('/api/stackOverFlow/questions', (req, res) => {
     var year = req.headers.year
 
 
-    if (req.headers.token && branch && subject && year && jwt.verify(req.headers.token)) {
-        studentRoute.stackOverFlowQuestion.find({
-            year: year,
-            branch: branch,
-            subject: subject
-        }).limit(10).then(questions => {
-            if (questions) {
-                res.json({
-                    questions
-                })
+    if (req.headers.token && branch && subject && year) {
+
+        jwt.verify(req.headers.token, 'verySecretValue', (err, result) => {
+            if (err) {
+                res.sendStatus(403);
             } else {
-                res.sendStatus(404);
+                studentRoute.stackOverFlowQuestion.find({
+                    year: year,
+                    branch: branch,
+                    subject: subject
+                }).limit(10).then(questions => {
+                    if (questions) {
+                        res.json({
+                            questions
+                        })
+                    } else {
+                        res.sendStatus(404);
+                    }
+                })
             }
         })
+
     } else {
         res.sendStatus(403);
     }
 })
 
-
+app.post('/api/stackOverFlow/addQuestion', (req, res) => {
+    jwt.verify(req.headers.token, 'verySecretValue', (err, result) => {
+        if (err) {
+            res.sendStatus(403);
+            console.error(err);
+        } else {
+            if (result.usn != req.headers.usn) {
+                res.sendStatus(403);
+                console.log(result.usn);
+            } else {
+                studentRoute.student.findOne({
+                    usn: req.headers.usn
+                }).then(student => {
+                    let question = new studentRoute.stackOverFlowQuestion({
+                        question: req.headers.question,
+                        author: student,
+                        subject: req.headers.subject,
+                        branch: req.headers.branch,
+                        year: req.headers.year
+                    })
+                    question.save().then(val => {
+                        res.sendStatus(200)
+                    }).catch(err => {
+                        console.error(err);
+                        res.sendStatus(400)
+                    })
+                }).catch(err => {
+                    console.error(err);
+                })
+            }
+        }
+    })
+})
 
 
 app.listen(PORT, () => {
