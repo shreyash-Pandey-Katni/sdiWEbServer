@@ -5,6 +5,7 @@ const authRoute = require('./route/auth')
 const mongoose = require('mongoose')
 const xlsx = require('xlsx');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 
 const PORT = process.env.PORT || 4000;
@@ -31,6 +32,34 @@ app.get('/api/timetable', (req, res) => {
     }
 })
 app.use('/api/students', authRoute)
+
+app.get('/api/stackOverFlow/questions', (req, res) => {
+    var branch = req.headers.branch
+    var subject = req.headers.subject
+    var year = req.headers.year
+
+
+    if (req.headers.token && branch && subject && year && jwt.verify(req.headers.token)) {
+        studentRoute.stackOverFlowQuestion.find({
+            year: year,
+            branch: branch,
+            subject: subject
+        }).limit(10).then(questions => {
+            if (questions) {
+                res.json({
+                    questions
+                })
+            } else {
+                res.sendStatus(404);
+            }
+        })
+    } else {
+        res.sendStatus(403);
+    }
+})
+
+
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);

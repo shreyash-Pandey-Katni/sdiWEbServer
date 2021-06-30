@@ -18,7 +18,7 @@ const studentSchema = new schema({
     password: {
         type: String
     },
-    usn : {
+    usn: {
         type: String,
         unique: true,
         required: true
@@ -27,7 +27,8 @@ const studentSchema = new schema({
         type: String
     },
     cgpa: {
-        type: String,
+        type: Double,
+        default: 0.0
     },
     semester: {
         type: Number,
@@ -41,7 +42,9 @@ const studentSchema = new schema({
         type: String,
         required: true
     }
-}, {timestamps:true});
+}, {
+    timestamps: true
+});
 const professorSchema = new schema({
     name: {
         type: String,
@@ -57,6 +60,8 @@ const professorSchema = new schema({
         required: true,
     },
 });
+
+//Schema of Question
 const questionSchema = new schema({
     question: {
         type: String,
@@ -68,6 +73,8 @@ const questionSchema = new schema({
     }
 })
 
+
+//schema for mcq
 const mcqSchema = new schema({
     title: {
         type: String,
@@ -91,8 +98,60 @@ const mcqSchema = new schema({
     }
 })
 
+//answers schema for stackoverflow
+const answersSchemaStackOverFlow = new schema({
+    answer: {
+        type: String,
+        required: true
+    },
+    upvotes: {
+        type: Number,
+        default: 0,
+        // required: true
+    },
+    downVotes: {
+        type: Number,
+        default: 0
+    }
+})
+
+//question schema for stackoverflow
+const questionSchemaStackOverFlow = new schema({
+    question: {
+        type: String,
+        required: true
+    },
+    answer: {
+        type: [answersSchemaStackOverFlow]
+    },
+    author: {
+        type: student,
+        required: true
+    },
+    subject: {
+        type: String,
+        default: 'misc'
+    },
+    branch: {
+        type: String,
+        required: true
+    },
+    year: {
+        type: Number,
+        required: true,
+        default: 0
+    }
+})
+
+
 const student = mongoose.model('Student', studentSchema);
 const professor = mongoose.model('Professor', professorSchema);
 const mcq = mongoose.model('MCQ', mcqSchema);
+const stackOverFlowQuestion = mongoose.model('StackOverFlowQuestion', questionSchemaStackOverFlow);
 
-module.exports = {student, professor, mcq};
+module.exports = {
+    student,
+    professor,
+    mcq,
+    stackOverFlowQuestion
+};
