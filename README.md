@@ -10,6 +10,13 @@ APIs:
   b.section
 2. /stackOverFlow/questions: It will return at most 50 questions. It requires :
   a. branch
-  b. semester
+  b. year
   c. subject
-  
+3. /stackOverFlow/addQuestion: It will help you in adding new question to the database. you will need to use POST method. It requires:
+  a. question: String
+  b. subject: String
+  c. branch: String
+  d. year: Number
+4. /stackOverFlow/getQuestion/:questionId  : It will return Question. use get method
+5. /stackOverFlow/addAnswer/:questionId : It will add answer. Use POST method. It requires following header fields:
+  a. answer: String
