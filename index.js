@@ -15,6 +15,25 @@ mongoose.connect(MONGO_URI, {
     useUnifiedTopology: true
 })
 
+app.use((req, res, next) => {
+    if (req.path.includes('/api/')) {
+        jwt.verify(req.headers.token, 'verySecretValue', (err, result) => {
+            if (err) {
+                res.sendStatus(400)
+            } else {
+                if (result.usn == req.headers.usn) {
+                    next()
+                } else {
+                    res.sendStatus(403)
+                }
+            }
+        })
+
+    } else {
+        next()
+    }
+})
+
 app.get('/api/timetable', (req, res) => {
     var workbook = xlsx.readFile(path.join(__dirname, 'assets', 'timetable', 'timetable.xlsx'));
     try {
@@ -31,7 +50,7 @@ app.get('/api/timetable', (req, res) => {
         res.sendStatus(403);
     }
 })
-app.use('/api/students', authRoute)
+app.use('/students', authRoute)
 
 app.get('/api/stackOverFlow/questions', (req, res) => {
     var branch = req.headers.branch
@@ -67,39 +86,83 @@ app.get('/api/stackOverFlow/questions', (req, res) => {
 })
 
 app.post('/api/stackOverFlow/addQuestion', (req, res) => {
-    jwt.verify(req.headers.token, 'verySecretValue', (err, result) => {
-        if (err) {
-            res.sendStatus(403);
+
+    studentRoute.student.findOne({
+        usn: req.headers.usn
+    }).then(student => {
+        console.log(student);
+        let question = new studentRoute.stackOverFlowQuestion({
+            question: req.headers.question,
+            author: student._id,
+            subject: req.headers.subject,
+            branch: req.headers.branch,
+            year: req.headers.year
+        })
+        question.save().then(val => {
+            console.log(val);
+            res.sendStatus(200)
+        }).catch(err => {
             console.error(err);
+            res.sendStatus(400)
+        })
+    }).catch(err => {
+        console.error(err);
+    })
+
+})
+
+
+app.get('/api/stackOverFlow/getQuestion/:question', (req, res) => {
+    studentRoute.stackOverFlowQuestion.findById(req.params.question + "", (err, queryResult) => {
+        if (err) {
+            res.sendStatus(404)
         } else {
-            if (result.usn != req.headers.usn) {
-                res.sendStatus(403);
-                console.log(result.usn);
-            } else {
-                studentRoute.student.findOne({
-                    usn: req.headers.usn
-                }).then(student => {
-                    let question = new studentRoute.stackOverFlowQuestion({
-                        question: req.headers.question,
-                        author: student,
-                        subject: req.headers.subject,
-                        branch: req.headers.branch,
-                        year: req.headers.year
-                    })
-                    question.save().then(val => {
-                        res.sendStatus(200)
-                    }).catch(err => {
-                        console.error(err);
-                        res.sendStatus(400)
-                    })
-                }).catch(err => {
-                    console.error(err);
-                })
-            }
+            res.json({
+                queryResult
+            })
         }
+    })
+
+})
+
+app.post('/api/stackOverFlow/addAnswer/:questionId', (req, res) => {
+    studentRoute.student.findOne({
+        usn: req.headers.usn
+    }).then(student => {
+        let answerNew = new studentRoute.answersModelStackOverFlow({
+            answer: req.headers.answer,
+            author: student._id
+        })
+        answerNew.save().then(val => {
+            studentRoute.stackOverFlowQuestion.updateOne({
+                _id: req.params.questionId
+            }, {
+                $push: {
+                    answer: val
+                }
+            }, (err, queryResult) => {
+                if (err) {
+                    console.error(err);
+                    res.sendStatus(404)
+                } else {
+                    res.sendStatus(200)
+                }
+            })
+        })
     })
 })
 
+app.post('/api/stackOverFlow/upVoteAnswer/:answerId', (req, res) => {
+    studentRoute.answersModelStackOverFlow.updateOne({
+        _id: req.params.answerId
+    }, {
+        $inc: {
+            'upVotes': 1
+        }
+    }).then(val => {
+        console.log(val);
+    })
+})
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);

@@ -104,7 +104,7 @@ const answersSchemaStackOverFlow = new schema({
         type: String,
         required: true
     },
-    upvotes: {
+    upVotes: {
         type: Number,
         default: 0,
         // required: true
@@ -112,6 +112,10 @@ const answersSchemaStackOverFlow = new schema({
     downVotes: {
         type: Number,
         default: 0
+    },
+    author: {
+        type: String,
+        required: true
     }
 })
 
@@ -125,7 +129,7 @@ const questionSchemaStackOverFlow = new schema({
         type: [answersSchemaStackOverFlow]
     },
     author: {
-        type: studentSchema,
+        type: String,
         required: true
     },
     subject: {
@@ -148,10 +152,13 @@ const student = mongoose.model('Student', studentSchema);
 const professor = mongoose.model('Professor', professorSchema);
 const mcq = mongoose.model('MCQ', mcqSchema);
 const stackOverFlowQuestion = mongoose.model('StackOverFlowQuestion', questionSchemaStackOverFlow);
+const answersModelStackOverFlow = mongoose.model('StackOverFlowAnswer', answersSchemaStackOverFlow);
+
 
 module.exports = {
     student,
     professor,
     mcq,
-    stackOverFlowQuestion
+    stackOverFlowQuestion,
+    answersModelStackOverFlow
 };

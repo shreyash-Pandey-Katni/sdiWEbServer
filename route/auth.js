@@ -68,9 +68,7 @@ router.get('/login', (req, res, next) => {
                     if (result) {
                         let token = jwt.sign({
                             usn: students.usn
-                        }, 'verySecretValue', {
-                            expiresIn: '1h'
-                        })
+                        }, 'verySecretValue')
                         res.json({
                             token,
                             "name": students.name,
