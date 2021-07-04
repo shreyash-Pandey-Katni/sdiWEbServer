@@ -71,9 +71,7 @@ router.get('/login', (req, res, next) => {
                         }, 'verySecretValue')
                         res.json({
                             token,
-                            "name": students.name,
-                            "semester": students.semester == null ? 0 : students.semester,
-                            "marks": students.marks == null ? 0 : students.marks
+                            students
                         });
                         // res.sendStatus(200)
                     }

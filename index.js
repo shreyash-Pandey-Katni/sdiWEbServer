@@ -60,26 +60,20 @@ app.get('/api/stackOverFlow/questions', (req, res) => {
 
     if (req.headers.token && branch && subject && year) {
 
-        jwt.verify(req.headers.token, 'verySecretValue', (err, result) => {
-            if (err) {
-                res.sendStatus(403);
-            } else {
-                studentRoute.stackOverFlowQuestion.find({
-                    year: year,
-                    branch: branch,
-                    subject: subject
-                }).limit(10).then(questions => {
-                    if (questions) {
-                        res.json({
-                            questions
-                        })
-                    } else {
-                        res.sendStatus(404);
-                    }
+
+        studentRoute.stackOverFlowQuestion.find({
+            year: year,
+            branch: branch,
+            subject: subject
+        }).limit(50).then(questions => {
+            if (questions) {
+                res.json({
+                    questions
                 })
+            } else {
+                res.sendStatus(404);
             }
         })
-
     } else {
         res.sendStatus(403);
     }
