@@ -147,14 +147,30 @@ app.post('/api/stackOverFlow/addAnswer/:questionId', (req, res) => {
 })
 
 app.post('/api/stackOverFlow/upVoteAnswer/:answerId', (req, res) => {
-    studentRoute.answersModelStackOverFlow.updateOne({
+    studentRoute.answersModelStackOverFlow.findOneAndUpdate({
         _id: req.params.answerId
     }, {
         $inc: {
             'upVotes': 1
         }
     }).then(val => {
-        console.log(val);
+        res.json({
+            val
+        })
+    })
+})
+
+app.post('/api/stackOverFlow/downVoteAnswer/:answerId', (req, res) => {
+    studentRoute.answersModelStackOverFlow.findOneAndUpdate({
+        _id: req.params.answerId
+    }, {
+        $inc: {
+            'downVotes': 1
+        }
+    }).then(val => {
+        res.json({
+            val
+        })
     })
 })
 
