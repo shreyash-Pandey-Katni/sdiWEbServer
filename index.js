@@ -6,9 +6,7 @@ const mongoose = require("mongoose");
 const xlsx = require("xlsx");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-const {
-    RSA_NO_PADDING
-} = require("constants");
+const notesRouter = require("./route/notes");
 
 const PORT = process.env.PORT || 4000;
 const MONGO_URI =
@@ -37,6 +35,8 @@ app.use((req, res, next) => {
         next();
     }
 });
+
+app.use("/api/notes", notesRouter);
 
 app.get("/api/timetable", (req, res) => {
     var workbook = xlsx.readFile(
@@ -180,21 +180,37 @@ app.post("/api/stackOverFlow/upVoteAnswer/:answerId", (req, res) => {
         .then((updatedAnswer) => {
             studentRoute.stackOverFlowQuestion
                 .findOne({
-                    _id: req.headers.questionid,
-                }, (err, question) => {
-                    if (err) {
-                        res.sendStatus(403)
-                    } else {
-                        question.answer[question.answer.findIndex(ans => ans._id.toString() === updatedAnswer._id.toString())] = updatedAnswer
-
-                        question.save()
-
+                        _id: req.headers.questionid,
+                    },
+                    (err, question) => {
+                        if (err) {
+                            res.sendStatus(403);
+                        } else {
+                            question.answer[
+                                question.answer.findIndex(
+                                    (ans) => ans._id.toString() === updatedAnswer._id.toString()
+                                )
+                            ] = updatedAnswer;
+                            question.save();
+                        }
                     }
-                })
+                )
                 .then((val) => {
-                    res.json({
-                        val,
-                    });
+                    studentRoute.student
+                        .findByIdAndUpdate(updatedAnswer.author, {
+                            $inc: {
+                                marks: 1,
+                            },
+                        })
+                        .then((student) => {
+                            res
+                                .json({
+                                    val,
+                                })
+                                .catch((e) => {
+                                    console.log("Facing Error in saving student");
+                                });
+                        });
                 });
         });
 });
@@ -207,21 +223,29 @@ app.post("/api/stackOverFlow/downVoteAnswer/:answerId", (req, res) => {
             },
         })
         .then((updatedAnswer) => {
-            studentRoute.stackOverFlowQuestion
-                .findOne({
+            studentRoute.stackOverFlowQuestion.findOne({
                     _id: req.headers.questionid,
-                }, (err, question) => {
+                },
+                (err, question) => {
                     if (err) {
-                        res.sendStatus(403)
+                        res.sendStatus(403);
                     } else {
-                        question.answer[question.answer.findIndex(ans => ans._id.toString() === updatedAnswer._id.toString())] = updatedAnswer
+                        question.answer[
+                            question.answer.findIndex(
+                                (ans) => ans._id.toString() === updatedAnswer._id.toString()
+                            )
+                        ] = updatedAnswer;
 
-                        question.save().then(value => res.json({
-                            value
-                        }))
-
+                        question.save().then((value) => {
+                            studentRoute.student.findByIdAndUpdate(updatedAnswer.author, {
+                                $inc: {
+                                    marks: -1
+                                }
+                            }).then(student => res.json(value))
+                        });
                     }
-                })
+                }
+            );
         });
 });
 

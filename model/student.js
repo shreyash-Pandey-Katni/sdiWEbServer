@@ -24,7 +24,8 @@ const studentSchema = new schema({
         required: true
     },
     marks: {
-        type: String
+        type: Number,
+        default: 0
     },
     cgpa: {
         type: mongoose.Schema.Types.Decimal128,
