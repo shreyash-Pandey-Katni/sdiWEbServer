@@ -135,8 +135,42 @@ notesRouter.get('/getListOfAvailableSemesters', (req, res, next) => {
     }
 });
 
-notesRouter.get('/getPreviousYearQuestionPaper', (req, res, next) => {
-    
+notesRouter.get('/getPreviousYearQuestionPapers', (req, res, next) => {
+    var listOfAvailableQuestionPapers = [];
+    // console.log(path.join(path.dirname(__dirname), `assets/Notes/Sem_${req.headers.semester}`));
+    try {
+        fs.readdir(
+            path.join(
+                path.dirname(__dirname),
+                `assets/Notes/UG_Question_Papers/${req.headers.year}/BE QP ${req.headers.month}-${req.headers.year}/${req.headers.semester_month}`
+            ),
+            (err, folders) => {
+                if (err) {
+                    res.sendStatus(404)
+                } else {
+                    folders.forEach((folder) => listOfAvailableQuestionPapers.push(folder));
+                    res.json({
+                        listOfAvailableQuestionPapers,
+                    });
+                }
+            }
+        );
+    } catch (e) {
+        res.sendStatus(503);
+    }
+})
+
+notesRouter.get('/downloadQuestionPaper', (req, res) => {
+    var listOfAvailableQuestionPapers = [];
+    // console.log(path.join(path.dirname(__dirname), `assets/Notes/Sem_${req.headers.semester}`));
+    try {
+        res.sendFile(path.join(
+            path.dirname(__dirname),
+            `assets/Notes/UG_Question_Papers/${req.headers.year}/BE QP ${req.headers.month}-${req.headers.year}/${req.headers.semester_month}/${req.headers.file_name}`
+        ));
+    } catch (e) {
+        res.sendStatus(503);
+    }
 })
 
 module.exports = notesRouter;
