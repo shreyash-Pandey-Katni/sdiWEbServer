@@ -33,8 +33,8 @@ router.post('/register', (req, res, next) => {
             student.save()
                 .then(student => {
                     try {
-                        if (!fs.existsSync(path.join(__dirname, 'assets', req.headers.usn))) {
-                            fs.mkdirSync(path.join(__dirname, 'assets', req.headers.usn))
+                        if (!fs.existsSync(path.join(__dirname, 'assets/AnswerSheets', req.headers.usn))) {
+                            fs.mkdirSync(path.join(__dirname, 'assets/AnswerSheets', req.headers.usn))
                         }
                     } catch (error) {
                         console.log(error);
