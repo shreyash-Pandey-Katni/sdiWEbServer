@@ -7,6 +7,7 @@ const xlsx = require("xlsx");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const notesRouter = require("./route/notes");
+const { answerSheetRouter } = require("./route/answerSheets");
 
 const PORT = process.env.PORT || 4000;
 const MONGO_URI =
@@ -37,7 +38,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/notes", notesRouter);
-
+app.use("/api/answerSheets", answerSheetRouter);
 app.get("/api/timetable", (req, res) => {
     var workbook = xlsx.readFile(
         path.join(__dirname, "assets", "timetable", "timetable.xlsx")
@@ -63,6 +64,8 @@ app.get("/api/timetable", (req, res) => {
     }
 });
 app.use("/students", authRoute);
+
+
 
 app.get("/api/stackOverFlow/questions", (req, res) => {
     var branch = req.headers.branch;
