@@ -20,7 +20,7 @@ answerSheetRouter.post('/answerSheetUpload', (req, res) => {
             storage: multer.diskStorage({
                 destination: path.join(path.dirname(__dirname), `assets/AnswerSheets/${req.headers.usn}/${req.headers.test}`),
                 filename: (req, file, cb) => {
-                    cb(null, `${req.headers.usn}_${req.headers.test}.${path.extname(file.originalname)}`)
+                    cb(null, `${req.headers.usn}_${req.headers.test}${path.extname(file.originalname)}`)
                 }
             })
         }).single('file_name');
@@ -38,9 +38,11 @@ answerSheetRouter.post('/answerSheetUpload', (req, res) => {
 
 answerSheetRouter.get('/checkAnswerSheet', (req, res) => {
     try {
-        // if (!req.headers.) {
-
-        // }
+        if (!req.headers.test || !req.headers.usn) {
+            res.sendStatus(404);
+            return;
+        }
+        res.sendFile(path.join(path.dirname(__dirname), `assets/AnswerSheets/${req.headers.usn}/${req.headers.test}/${req.headers.usn}_${req.headers.test}.pdf`))
     } catch (error) {
         res.sendStatus(403);
     }
