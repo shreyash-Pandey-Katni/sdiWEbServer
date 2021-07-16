@@ -1,6 +1,29 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
+const attendanceSchema = new schema({
+    subject: {
+        type: String,
+        required: true,
+    },
+    attendance: {
+        type: Number,
+        required: true,
+        default: 0
+    }
+})
+
+const semesterSchema = new schema({
+    semester: {
+        type: Number,
+        required: true,
+    },
+    section: {
+        type: String,
+        required: true
+    }
+})
+
 const studentSchema = new schema({
     name: {
         type: String,
@@ -32,16 +55,15 @@ const studentSchema = new schema({
         default: 0.0
     },
     semester: {
-        type: Number,
+        type: semesterSchema,
         required: true
-    },
-    section: {
-        type: String,
-        required: true,
     },
     batch: {
         type: String,
         required: true
+    },
+    attendance: {
+        type: [attendanceSchema]
     }
 }, {
     timestamps: true
@@ -57,7 +79,7 @@ const professorSchema = new schema({
         unique: true
     },
     semesters: {
-        type: [String],
+        type: [semesterSchema],
         required: true,
     },
 });
@@ -150,16 +172,18 @@ const questionSchemaStackOverFlow = new schema({
 
 
 const student = mongoose.model('Student', studentSchema);
-const professor = mongoose.model('Professor', professorSchema);
+const professors = mongoose.model('Professor', professorSchema);
 const mcq = mongoose.model('MCQ', mcqSchema);
 const stackOverFlowQuestion = mongoose.model('StackOverFlowQuestion', questionSchemaStackOverFlow);
 const answersModelStackOverFlow = mongoose.model('StackOverFlowAnswer', answersSchemaStackOverFlow);
+const semesterModel = mongoose.model('semesterModel', semesterSchema);
 
 
 module.exports = {
     student,
-    professor,
+    professors,
     mcq,
     stackOverFlowQuestion,
-    answersModelStackOverFlow
+    answersModelStackOverFlow,
+    semesterModel
 };
