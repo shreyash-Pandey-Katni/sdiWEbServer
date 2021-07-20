@@ -8,6 +8,7 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const notesRouter = require("./route/notes");
 const { answerSheetRouter } = require("./route/answerSheets");
+const { professorRoutes } = require("./route/professorRoutes");
 
 const PORT = process.env.PORT || 4000;
 const MONGO_URI =
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
         next();
     }
 });
-
+app.use('/professor', professorRoutes);
 app.use("/api/notes", notesRouter);
 app.use("/api/answerSheets", answerSheetRouter);
 app.get("/api/timetable", (req, res) => {

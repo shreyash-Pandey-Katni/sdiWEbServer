@@ -82,6 +82,10 @@ const professorSchema = new schema({
         type: [semesterSchema],
         required: true,
     },
+    password: {
+        type: String,
+        required: true,
+    },
 });
 
 //Schema of Question

@@ -1,6 +1,7 @@
 const express = require('express');
 const professorRoutes = express.Router();
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const {
     professors,
     student,
@@ -8,7 +9,7 @@ const {
 } = require('../model/student');
 
 professorRoutes.post('/register', (req, res) => {
-    if (!req.headers.name || !req.headers.email || !req.headers.semesters || !req.headers.password) {
+    if (!req.headers.name || !req.headers.email || !req.headers.password) {
         res.sendStatus(404)
     } else {
         bcryptjs.hash(req.headers.password, 10, (err, hashPassword) => {
@@ -40,8 +41,10 @@ professorRoutes.get('/login', (req, res) => {
         })
         .then(professor => {
             if (professor) {
+                console.log(professor);
                 bcryptjs.compare(password, professor.password, (err, result) => {
                     if (err) {
+                        console.error(err);
                         res.sendStatus(403);
                     }
                     if (result) {
@@ -79,16 +82,17 @@ professorRoutes.use((req, res, next) => {
 
 const professorFunctionsRoutes = express.Router();
 
-professorRoutes.use('/professor/functions', professorFunctionsRoutes);
+professorRoutes.use('/functions', professorFunctionsRoutes);
 
-professorRoutes.post('/addSemester', (req, res) => {
+professorFunctionsRoutes.post('/addSemester', (req, res) => {
+    // console.log(req.headers.token);
     if (req.headers.semester && req.headers.section) {
-        professors.findOne({
+        professors.findOneAndUpdate({
             email: req.headers.email
         }, {
             $push: {
                 semesters: new semesterModel({
-                    semester: req.headers.semesters,
+                    semester: req.headers.semester,
                     section: req.headers.section
                 })
             }
@@ -111,9 +115,37 @@ professorFunctionsRoutes.get('/listOfStudents', (req, res) => {
     try {
         student.find({
             semester: req.headers.semester
-        })
+        }).then(
+            students => {
+                res.json({
+                    students
+                })
+            }
+        )
     } catch (err) {
         console.error(err);
         res.sendStatus(400);
     }
 })
+
+professorFunctionsRoutes.post('/updateAttendance', (req, res) => {
+    if (!req.headers.studentUsn && !req.headers.subjectCode) {
+        res.sendStatus(404)
+    }
+    student.findOne({
+        usn: req.headers.studentUsn
+    }).then(student => {
+        student.attendance[student.attendance.findIndex(attendance => {
+            attendance.subjectCode == req.headers.subjectCode
+        })].attendance += 1;
+        res.sendStatus(200);
+    }).catch(err => {
+        console.error(err);
+        res.sendStatus(400);
+    })
+})
+
+module.exports = {
+    professorRoutes,
+    professorFunctionsRoutes
+};
