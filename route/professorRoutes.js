@@ -138,12 +138,17 @@ professorFunctionsRoutes.post('/updateAttendance', (req, res) => {
         student.attendance[student.attendance.findIndex(attendance => {
             attendance.subjectCode == req.headers.subjectCode
         })].attendance += 1;
-        res.sendStatus(200);
+        student.save().then(() => {
+            res.sendStatus(200)
+        }
+        ).catch(err => res.sendStatus(400))
     }).catch(err => {
         console.error(err);
         res.sendStatus(400);
     })
 })
+
+
 
 module.exports = {
     professorRoutes,

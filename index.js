@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const studentRoute = require("./model/student");
 const authRoute = require("./route/auth");
 const mongoose = require("mongoose");
@@ -20,6 +21,7 @@ mongoose.connect(MONGO_URI, {
     useCreateIndex: true,
 });
 
+app.use(cors())
 app.use((req, res, next) => {
     if (req.path.includes("/api/")) {
         jwt.verify(req.headers.token, "verySecretValue", (err, result) => {

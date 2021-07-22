@@ -17,21 +17,35 @@ router.post('/register', (req, res, next) => {
                 res.json({
                     error: err
                 })
+                return;
             }
-            let student = new Student.student({
-                name: req.headers.name,
-                phone: req.headers.phone,
-                email: req.headers.email,
-                password: hashPassword,
-                usn: req.headers.usn,
+            let semester = new Student.semesterModel({
                 semester: req.headers.semester,
-                section: req.headers.section,
-                batch: req.headers.batch
-                // usn: req.headers.usn
-            })
-
-            student.save()
-                .then(student => {
+                section: req.headers.section
+            });
+            semester.save((err, data) => {
+                if (err) {
+                    res.json({
+                        error: err
+                    })
+                    return;
+                }
+                let student = new Student.student({
+                    name: req.headers.name,
+                    phone: req.headers.phone,
+                    email: req.headers.email,
+                    password: hashPassword,
+                    usn: req.headers.usn,
+                    batch: req.headers.batch,
+                    semester: data
+                });
+                student.save((err, data) => {
+                    if (err) {
+                        res.json({
+                            error: err
+                        })
+                        return;
+                    }
                     try {
                         if (!fs.existsSync(path.join(__dirname, 'assets/AnswerSheets', req.headers.usn))) {
                             fs.mkdirSync(path.join(__dirname, 'assets/AnswerSheets', req.headers.usn))
@@ -39,12 +53,12 @@ router.post('/register', (req, res, next) => {
                     } catch (error) {
                         console.log(error);
                     }
-                    res.sendStatus(200);
+                    res.json({
+                        success: true
+                    })
                 })
-                .catch(err => {
-                    console.error(err);
-                    res.sendStatus(403);
-                })
+            })
+
         })
 
     } else {
@@ -81,4 +95,48 @@ router.get('/login', (req, res, next) => {
             }
         })
 });
+
+router.get('/getAttendance', (req, res) => {
+    jwt.verify(req.headers.token, 'verySecretValue', (err, decoded) => {
+        if (decoded.usn == req.headers.usn) {
+            Student.student.findOne({
+                    usn: req.headers.usn
+                })
+                .then(students => {
+                    if (students) {
+                        res.json({
+                            attendance: students.attendance
+                        })
+                    } else {
+                        res.sendStatus(404)
+                    }
+                })
+        }
+    })
+})
+
+router.post('/addSubject', (req, res) => {
+    jwt.verify(req.headers.token, 'verySecretValue', (err, decoded) => {
+        if (decoded.usn == req.headers.usn) {
+            Student.student.findOne({
+                    usn: req.headers.usn
+                })
+                .then(students => {
+                    if (students) {
+                        let subject = {
+                            subject: req.headers.subject_code,
+                            attendance: req.headers.attendance
+                        }
+                        students.attendance.push(subject);
+                        students.save()
+                            .then(students => {
+                                res.sendStatus(200);
+                            })
+                    } else {
+                        res.sendStatus(404)
+                    }
+                })
+        }
+    })
+})
 module.exports = router;

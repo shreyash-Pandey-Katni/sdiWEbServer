@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const attendanceSchema = new schema({
+    total: {
+        type: Number,
+        default: 0
+    },
     subject: {
         type: String,
         required: true,
@@ -175,6 +179,8 @@ const questionSchemaStackOverFlow = new schema({
 })
 
 
+
+const attendanceModel = mongoose.model('attendance', attendanceSchema);
 const student = mongoose.model('Student', studentSchema);
 const professors = mongoose.model('Professor', professorSchema);
 const mcq = mongoose.model('MCQ', mcqSchema);
@@ -189,5 +195,6 @@ module.exports = {
     mcq,
     stackOverFlowQuestion,
     answersModelStackOverFlow,
-    semesterModel
+    semesterModel,
+    attendanceModel
 };

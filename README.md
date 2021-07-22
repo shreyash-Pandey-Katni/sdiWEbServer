@@ -21,14 +21,19 @@ APIs:
      * Method: GET
 
      * branch: String
+
      * year: Number
+
      * subject: String
 
   3. /stackOverFlow/addQuestion: It will help you in adding new question to the database. It requires:
      * Method: POST
      * question: String
+
      * subject: String
+
      * branch: String
+
      * year: Number
 
   4. /stackOverFlow/getQuestion/:questionId  : It will return Question.
@@ -61,12 +66,14 @@ APIs:
      * semester: Number
 
      * subject: String
+
   3. /getNotes: It will give access to a particular Notes.
      * Method: GET
 
      * semester: Number
 
      * subject: String
+
      * file_name: String
   4. /listOfYears: It will return List of years whose notes are available.
      * Method: GET
@@ -75,21 +82,25 @@ APIs:
      * Method: GET
 
      * year: Number
+
   6. /getListOfAvailableSemesters: It will return list of Available Semesters.
      * Method: GET
 
      * year: Number
+
      * month: String
   7. /getPreviousYearQuestionPapers: It will return list of available Previous year question paper in DB.
      * Method: GET
 
      * year: Number
+
      * month: String
      * semester_month: String
   8. /downloadQuestionPaper: It will return the pdf format file of Question paper.
      * Method: GET
 
      * year: Number
+
      * month: String
      * semester_month: String
      * file_name: String
