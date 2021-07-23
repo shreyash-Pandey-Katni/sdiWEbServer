@@ -160,9 +160,7 @@ router.post('/addGrievance', (req, res) => {
                 let newGrievance = new grievance({
                     anonymous: false,
                     details: req.headers.details,
-                    name: req.headers.name,
                     usn: req.headers.usn,
-                    email: req.headers.email
                 });
                 newGrievance.save().then(newGrievance => {
                     res.json({
