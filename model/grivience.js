@@ -1,4 +1,6 @@
-const { Schema } = require("mongoose");
+const {
+    Schema
+} = require("mongoose");
 const mongoose = require('mongoose')
 
 
@@ -8,14 +10,8 @@ const grievanceSchema = new Schema({
         required: true,
         default: false,
     },
-    name: {
-        type: String,
-    },
     usn: {
         type: String,
-    },
-    email: {
-        type: String
     },
     details: {
         type: String,
