@@ -146,7 +146,8 @@ router.post('/addSubject', (req, res) => {
 router.post('/addGrievance', (req, res) => {
     jwt.verify(req.headers.token, 'verySecretValue', (err, decoded) => {
         if (decoded.usn == req.headers.usn) {
-            if (req.headers.isAnnonymous) {
+            // console.log(req.headers);
+            if (req.headers.isannonymous) {
                 let newGrievance = new grievance({
                     anonymous: true,
                     details: req.headers.details,
