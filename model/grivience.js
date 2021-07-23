@@ -11,6 +11,9 @@ const grievanceSchema = new Schema({
     name: {
         type: String,
     },
+    usn: {
+        type: String,
+    },
     email: {
         type: String
     },

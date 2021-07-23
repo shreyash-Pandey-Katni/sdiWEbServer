@@ -8,6 +8,9 @@ const path = require('path');
 const mongoose = require('mongoose');
 
 const authController = require('../controllers/AuthController');
+const {
+    grievance
+} = require('../model/grivience');
 
 
 router.post('/register', (req, res, next) => {
@@ -139,4 +142,38 @@ router.post('/addSubject', (req, res) => {
         }
     })
 })
+
+router.post('/addGrievance', (req, res) => {
+    jwt.verify(req.headers.token, 'verySecretValue', (err, decoded) => {
+        if (decoded.usn == req.headers.usn) {
+            if (req.headers.isAnnonymous) {
+                let newGrievance = new grievance({
+                    anonymous: true,
+                    details: req.headers.details,
+                });
+                newGrievance.save().then(newGrievance => {
+                    res.sendStatus(200);
+                }).catch(err => {
+                    res.sendStatus(500);
+                })
+            } else {
+                let newGrievance = new grievance({
+                    anonymous: false,
+                    details: req.headers.details,
+                    name: req.headers.name,
+                    usn: req.headers.usn,
+                    email: req.headers.email
+                });
+                newGrievance.save().then(newGrievance => {
+                    res.json({
+                        newGrievance
+                    })
+                }).catch(err => {
+                    res.sendStatus(500);
+                })
+            }
+        }
+    })
+})
+
 module.exports = router;
